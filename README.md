@@ -1,4 +1,4 @@
-# Dancing Agent
+# Dancing Agent 💃🕺
 
 A reinforcement learning agent that learns to dance to music. A MuJoCo humanoid is trained with PPO to synchronize its gait with audio features — and crucially, to move **differently** depending on the genre (hip-hop, waltz, EDM).
 
