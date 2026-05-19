@@ -1,11 +1,11 @@
 """
 Usage:
-    python train.py                        # all 3 genres, 3M steps
-    python train.py --genre hiphop         # single genre sanity check
-    python train.py --timesteps 1_000_000
+    python train.py --config configs/control.json
+    python train.py --config configs/beat_heavy.json --timesteps 1_000_000
 """
 import os
 os.environ.setdefault("MUJOCO_GL", "osmesa")
+import json
 import argparse
 import wandb
 from wandb.integration.sb3 import WandbCallback
@@ -19,8 +19,8 @@ from callbacks.reward_log_callback import RewardLogCallback
 from callbacks.wandb_eval_callback import WandbEvalCallback
 
 
-def build_envs(features_dir, genre, n_envs):
-    env = SubprocVecEnv([make_env(features_dir, genre) for _ in range(n_envs)])
+def build_envs(features_dir, genre, n_envs, reward_weights):
+    env = SubprocVecEnv([make_env(features_dir, genre, reward_weights) for _ in range(n_envs)])
     return VecNormalize(env, norm_obs=True, norm_reward=True, clip_obs=10.0)
 
 
@@ -30,8 +30,8 @@ def build_model(env):
                clip_range=0.2, verbose=1, device="cpu")
 
 
-def build_callbacks(features_dir, genre, n_envs, eval_freq, save_dir):
-    eval_env = SubprocVecEnv([make_env(features_dir, genre)])
+def build_callbacks(features_dir, genre, n_envs, eval_freq, save_dir, reward_weights):
+    eval_env = SubprocVecEnv([make_env(features_dir, genre, reward_weights)])
     eval_env = VecNormalize(eval_env, norm_obs=True, norm_reward=False, training=False)
     return [
         CheckpointCallback(save_freq=max(500_000 // n_envs, 1), save_path=save_dir, name_prefix="dance_agent"),
@@ -50,16 +50,24 @@ def main():
     p.add_argument("--save_dir", default="checkpoints")
     p.add_argument("--video_dir", default="videos/training")
     p.add_argument("--video_freq", type=int, default=500_000)
+    p.add_argument("--run_name", type=str, default=None)
+    p.add_argument("--config", type=str, default=None,
+                   help="Path to reward weights JSON (e.g. configs/control.json)")
     args = p.parse_args()
+
+    reward_weights = json.loads(open(args.config).read()) if args.config else {}
+    if args.run_name is None and args.config:
+        args.run_name = os.path.splitext(os.path.basename(args.config))[0]
 
     run = wandb.init(
         project="dancing-agent",
+        name=args.run_name,
         config=vars(args),
         sync_tensorboard=False,
         monitor_gym=False,
     )
 
-    env = build_envs(args.features_dir, args.genre, args.n_envs)
+    env = build_envs(args.features_dir, args.genre, args.n_envs, reward_weights)
     model = build_model(env)
     genres = [args.genre] if args.genre else GENRES
     video_cb = VideoCallback(
@@ -74,7 +82,7 @@ def main():
         model_save_path=f"{args.save_dir}/wandb",
         verbose=1,
     )
-    callbacks = build_callbacks(args.features_dir, args.genre, args.n_envs, args.eval_freq, args.save_dir)
+    callbacks = build_callbacks(args.features_dir, args.genre, args.n_envs, args.eval_freq, args.save_dir, reward_weights)
     callbacks += [video_cb, wandb_cb, RewardLogCallback()]
     model.learn(total_timesteps=args.timesteps, callback=callbacks)
     run.finish()

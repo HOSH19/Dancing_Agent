@@ -5,9 +5,9 @@ from rewards.reward_fn import DanceRewardTracker
 
 
 class DanceEnvWithReward(DanceEnv):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, reward_weights: dict = None, **kwargs):
         super().__init__(*args, **kwargs)
-        self._tracker = DanceRewardTracker()
+        self._tracker = DanceRewardTracker(**(reward_weights or {}))
 
     def reset(self, **kwargs):
         self._tracker.reset_episode()
@@ -29,7 +29,8 @@ class DanceEnvWithReward(DanceEnv):
         return obs, reward, terminated, truncated, info
 
 
-def make_env(features_dir: str, genre: str = None):
+def make_env(features_dir: str, genre: str = None, reward_weights: dict = None):
     def _init():
-        return Monitor(DanceEnvWithReward(features_dir=features_dir, genre=genre))
+        return Monitor(DanceEnvWithReward(features_dir=features_dir, genre=genre,
+                                          reward_weights=reward_weights))
     return _init

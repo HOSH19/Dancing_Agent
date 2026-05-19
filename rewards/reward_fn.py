@@ -2,11 +2,9 @@ from rewards.beat import beat_reward
 from rewards.energy import EnergyCorrelation
 from rewards.diversity import DiversityTracker, gait_vector
 
-W_BEAT, W_ENERGY, W_ALIVE, W_DIVERSITY = 0.5, 0.3, 0.05, 0.15
-
-
 class DanceRewardTracker:
-    def __init__(self):
+    def __init__(self, w_beat=0.5, w_energy=0.3, w_alive=0.05, w_diversity=0.15):
+        self._w = (w_beat, w_energy, w_alive, w_diversity)
         self._energy = EnergyCorrelation()
         self._diversity = DiversityTracker()
         self._prev_contacts: dict = {}
@@ -36,5 +34,6 @@ class DanceRewardTracker:
         r_alive = 1.0
         r_diversity = self._diversity.update(genre, gait_vector(self._step_freqs, self._com_heights))
 
-        total = W_BEAT * r_beat + W_ENERGY * r_energy + W_ALIVE * r_alive + W_DIVERSITY * r_diversity
+        wb, we, wa, wd = self._w
+        total = wb * r_beat + we * r_energy + wa * r_alive + wd * r_diversity
         return float(total), {"r_beat": r_beat, "r_energy": r_energy, "r_alive": r_alive, "r_diversity": r_diversity}
