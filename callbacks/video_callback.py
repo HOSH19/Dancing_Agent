@@ -1,4 +1,5 @@
 import os
+import tempfile
 import imageio
 import mujoco
 import numpy as np
@@ -6,7 +7,6 @@ import wandb
 from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 from envs.reward_env import make_env
-from envs.obs_space import GENRES
 
 VIDEO_FPS = 30
 RENDER_HW = 480
@@ -30,20 +30,28 @@ class VideoCallback(BaseCallback):
         self._last_recorded = self.num_timesteps
         step_dir = os.path.join(self._out_dir, f"step_{self.num_timesteps:09d}")
         os.makedirs(step_dir, exist_ok=True)
+
         all_frames = []
+        log_dict = {}
         for genre in self._genres:
-            frames = self._record_genre(genre, step_dir)
+            frames, path = self._record_genre(genre, step_dir)
             all_frames.append(frames)
+            log_dict[f"video/{genre}"] = wandb.Video(path, fps=VIDEO_FPS, format="mp4")
+
         if len(all_frames) > 1:
-            self._save_comparison(all_frames, step_dir)
+            path = self._save_comparison(all_frames, step_dir)
+            log_dict["video/all_genres"] = wandb.Video(path, fps=VIDEO_FPS, format="mp4")
+
+        wandb.log(log_dict, step=self.num_timesteps)
         return True
 
-    def _record_genre(self, genre: str, out_dir: str) -> list:
-        env = DummyVecEnv([make_env(self._features_dir, genre)])
-        if self._vec_normalize_path and os.path.exists(self._vec_normalize_path):
-            env = VecNormalize.load(self._vec_normalize_path, env)
-        else:
-            env = VecNormalize(env, norm_obs=True, norm_reward=False, training=False)
+    def _record_genre(self, genre: str, out_dir: str) -> tuple:
+        train_env = self.model.get_env()
+        with tempfile.NamedTemporaryFile(suffix=".pkl", delete=False) as f:
+            tmp_path = f.name
+        train_env.save(tmp_path)
+        env = VecNormalize.load(tmp_path, DummyVecEnv([make_env(self._features_dir, genre)]))
+        os.unlink(tmp_path)
         env.training = False
         env.norm_reward = False
 
@@ -60,18 +68,15 @@ class VideoCallback(BaseCallback):
         env.close()
         out_path = os.path.join(out_dir, f"{genre}.mp4")
         imageio.mimsave(out_path, frames, fps=VIDEO_FPS)
-        wandb.log({f"video/{genre}": wandb.Video(out_path, fps=VIDEO_FPS, format="mp4")},
-                  step=self.num_timesteps)
         if self.verbose:
             print(f"  [video] {genre} → {out_path}")
-        return frames
+        return frames, out_path
 
-    def _save_comparison(self, all_frames: list, out_dir: str):
+    def _save_comparison(self, all_frames: list, out_dir: str) -> str:
         min_len = min(len(f) for f in all_frames)
         combined = [np.concatenate([f[i] for f in all_frames], axis=1) for i in range(min_len)]
         path = os.path.join(out_dir, "all_genres.mp4")
         imageio.mimsave(path, combined, fps=VIDEO_FPS)
-        wandb.log({"video/all_genres": wandb.Video(path, fps=VIDEO_FPS, format="mp4")},
-                  step=self.num_timesteps)
         if self.verbose:
             print(f"  [video] side-by-side → {path}")
+        return path

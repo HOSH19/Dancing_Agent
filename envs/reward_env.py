@@ -18,7 +18,7 @@ class DanceEnvWithReward(DanceEnv):
         reward, reward_info = self._tracker.update(
             genre=info.get("genre", "hiphop"),
             base_reward=base_reward,
-            beat_indicator=info.get("beat_indicator", 0.0),
+            beat_phase=info.get("beat_phase", 0.0),
             rms_energy=info.get("rms_energy", 0.0),
             com_velocity=float(np.linalg.norm(self.data.qvel[:3])),
             com_height=float(self.data.qpos[2]),

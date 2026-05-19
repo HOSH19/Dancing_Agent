@@ -4,15 +4,19 @@ Usage:
     python train.py --genre hiphop         # single genre sanity check
     python train.py --timesteps 1_000_000
 """
+import os
+os.environ.setdefault("MUJOCO_GL", "osmesa")
 import argparse
 import wandb
 from wandb.integration.sb3 import WandbCallback
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import SubprocVecEnv, VecNormalize
-from stable_baselines3.common.callbacks import CheckpointCallback, EvalCallback
+from stable_baselines3.common.callbacks import CheckpointCallback
 from envs.reward_env import make_env
 from envs.obs_space import GENRES
 from callbacks.video_callback import VideoCallback
+from callbacks.reward_log_callback import RewardLogCallback
+from callbacks.wandb_eval_callback import WandbEvalCallback
 
 
 def build_envs(features_dir, genre, n_envs):
@@ -23,16 +27,16 @@ def build_envs(features_dir, genre, n_envs):
 def build_model(env):
     return PPO("MlpPolicy", env, n_steps=2048, batch_size=64, n_epochs=10,
                learning_rate=3e-4, ent_coef=0.01, gamma=0.99, gae_lambda=0.95,
-               clip_range=0.2, verbose=1)
+               clip_range=0.2, verbose=1, device="cpu")
 
 
-def build_callbacks(features_dir, genre, n_envs, save_dir):
+def build_callbacks(features_dir, genre, n_envs, eval_freq, save_dir):
     eval_env = SubprocVecEnv([make_env(features_dir, genre)])
     eval_env = VecNormalize(eval_env, norm_obs=True, norm_reward=False, training=False)
     return [
         CheckpointCallback(save_freq=max(500_000 // n_envs, 1), save_path=save_dir, name_prefix="dance_agent"),
-        EvalCallback(eval_env, eval_freq=max(100_000 // n_envs, 1), n_eval_episodes=3,
-                     best_model_save_path=f"{save_dir}/best", verbose=1),
+        WandbEvalCallback(eval_env, eval_freq=max(eval_freq // n_envs, 1), n_eval_episodes=3,
+                          best_model_save_path=f"{save_dir}/best", verbose=1),
     ]
 
 
@@ -42,6 +46,7 @@ def main():
     p.add_argument("--genre", default=None, choices=GENRES + [None])
     p.add_argument("--timesteps", type=int, default=3_000_000)
     p.add_argument("--n_envs", type=int, default=4)
+    p.add_argument("--eval_freq", type=int, default=50_000)
     p.add_argument("--save_dir", default="checkpoints")
     p.add_argument("--video_dir", default="videos/training")
     p.add_argument("--video_freq", type=int, default=500_000)
@@ -69,7 +74,8 @@ def main():
         model_save_path=f"{args.save_dir}/wandb",
         verbose=1,
     )
-    callbacks = build_callbacks(args.features_dir, args.genre, args.n_envs, args.save_dir) + [video_cb, wandb_cb]
+    callbacks = build_callbacks(args.features_dir, args.genre, args.n_envs, args.eval_freq, args.save_dir)
+    callbacks += [video_cb, wandb_cb, RewardLogCallback()]
     model.learn(total_timesteps=args.timesteps, callback=callbacks)
     run.finish()
     model.save(f"{args.save_dir}/dance_agent_final")

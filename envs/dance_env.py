@@ -41,7 +41,7 @@ class DanceEnv(HumanoidEnv):
         self._audio_step += 1
         t = min(self._audio_step, self._feat["n_rl_steps"] - 1) if self._feat else 0
         info["genre"] = self._current_genre
-        info["beat_indicator"] = float(self._feat["beat_indicator"][t]) if self._feat else 0.0
+        info["beat_phase"] = float(self._feat["beat_phase"][t]) if self._feat else 0.0
         info["rms_energy"] = float(self._feat["rms_energy"][t]) if self._feat else 0.0
         info["audio_step"] = self._audio_step
         if self._feat and self._audio_step >= self._feat["n_rl_steps"]:
