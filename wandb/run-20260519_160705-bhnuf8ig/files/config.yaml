@@ -1,0 +1,253 @@
+_current_progress_remaining:
+    value: 1
+_custom_logger:
+    value: "False"
+_episode_num:
+    value: 0
+_last_episode_starts:
+    value: '[ True  True  True  True  True  True]'
+_last_obs:
+    value: |-
+        [[-0.25081238 -0.6683274   0.8403076  ...  0.00288631  0.
+           0.        ]
+         [-0.3856124   0.699635    1.4013658  ...  0.00288631  0.
+           0.        ]
+         [-0.59415543  0.5749243  -0.7534288  ...  0.00288631  0.
+           0.        ]
+         [ 1.1140099   0.3583642  -0.26185971 ...  0.00288631  0.
+           0.        ]
+         [ 0.36290792 -0.8574949  -0.8115028  ...  0.00288631  0.
+           0.        ]
+         [-0.23002055 -0.09320538 -0.4148889  ...  0.00288631  0.
+           0.        ]]
+_last_original_obs:
+    value: |-
+        [[ 1.396886    0.9969113   0.00564754 ...  1.          0.
+           0.        ]
+         [ 1.3957282   1.0067668   0.00975905 ...  1.          0.
+           0.        ]
+         [ 1.3939371   1.0058683  -0.00603157 ...  1.          0.
+           0.        ]
+         [ 1.4086081   1.0043081  -0.00242929 ...  1.          0.
+           0.        ]
+         [ 1.4021571   0.9955484  -0.00645715 ...  1.          0.
+           0.        ]
+         [ 1.3970646   1.0010548  -0.00355071 ...  1.          0.
+           0.        ]]
+_logger:
+    value: <stable_baselines3.common.logger.Logger object at 0x70b14bb2cfd0>
+_n_updates:
+    value: 0
+_num_timesteps_at_start:
+    value: 0
+_stats_window_size:
+    value: 100
+_total_timesteps:
+    value: 3000000
+_vec_normalize_env:
+    value: <stable_baselines3.common.vec_env.vec_normalize.VecNormalize object at 0x70b166fe9090>
+_wandb:
+    value:
+        cli_version: 0.27.0
+        e:
+            3vi7z25usnx922tx573nab1sd6yvmq2d:
+                args:
+                    - --timesteps
+                    - "3_000_000"
+                    - --n_envs
+                    - "6"
+                    - --genre
+                    - hiphop
+                codePath: train.py
+                codePathLocal: train.py
+                cpu_count: 4
+                cpu_count_logical: 8
+                disk:
+                    /:
+                        total: "51835101184"
+                        used: "29869367296"
+                email: hoshuhan@gmail.com
+                executable: /home/hoshuhan/miniconda3/envs/dancing-agent/bin/python
+                git:
+                    commit: 076fdf1cafdcb23d1ef4850ee7fea3809a338864
+                    remote: https://github.com/HOSH19/Dancing_Agent.git
+                host: dancing
+                memory:
+                    total: "33651986432"
+                os: Linux-6.8.0-1058-gcp-x86_64-with-glibc2.35
+                program: /home/hoshuhan/Dancing_Agent/train.py
+                python: CPython 3.11.15
+                root: /home/hoshuhan/Dancing_Agent
+                startedAt: "2026-05-19T16:07:05.146735Z"
+                writerId: 3vi7z25usnx922tx573nab1sd6yvmq2d
+        m: []
+        python_version: 3.11.15
+        t:
+            "1":
+                - 1
+            "2":
+                - 1
+            "3":
+                - 1
+                - 16
+                - 22
+            "4": 3.11.15
+            "5": 0.27.0
+            "12": 0.27.0
+            "13": linux-x86_64
+action_noise:
+    value: None
+action_space:
+    value: Box(-0.4, 0.4, (17,), float32)
+algo:
+    value: PPO
+batch_size:
+    value: 64
+clip_range:
+    value: FloatSchedule(ConstantSchedule(val=0.2))
+clip_range_vf:
+    value: None
+device:
+    value: cpu
+ent_coef:
+    value: 0.01
+env:
+    value: <stable_baselines3.common.vec_env.vec_normalize.VecNormalize object at 0x70b166fe9090>
+ep_info_buffer:
+    value: deque([], maxlen=100)
+ep_success_buffer:
+    value: deque([], maxlen=100)
+features_dir:
+    value: features
+gae_lambda:
+    value: 0.95
+gamma:
+    value: 0.99
+genre:
+    value: hiphop
+learning_rate:
+    value: 0.0003
+lr_schedule:
+    value: FloatSchedule(ConstantSchedule(val=0.0003))
+max_grad_norm:
+    value: 0.5
+n_envs:
+    value: 6
+n_epochs:
+    value: 10
+n_steps:
+    value: 2048
+normalize_advantage:
+    value: "True"
+num_timesteps:
+    value: 0
+observation_space:
+    value: |-
+        Box([-inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf
+         -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf -inf   0.   0.
+           0.   0.   0.   0.   0.   0.], [inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf inf
+         inf inf inf inf inf inf  1.  1.  1.  1.  1.  1.  1.  1.], (356,), float32)
+policy:
+    value: |-
+        ActorCriticPolicy(
+          (features_extractor): FlattenExtractor(
+            (flatten): Flatten(start_dim=1, end_dim=-1)
+          )
+          (pi_features_extractor): FlattenExtractor(
+            (flatten): Flatten(start_dim=1, end_dim=-1)
+          )
+          (vf_features_extractor): FlattenExtractor(
+            (flatten): Flatten(start_dim=1, end_dim=-1)
+          )
+          (mlp_extractor): MlpExtractor(
+            (policy_net): Sequential(
+              (0): Linear(in_features=356, out_features=64, bias=True)
+              (1): Tanh()
+              (2): Linear(in_features=64, out_features=64, bias=True)
+              (3): Tanh()
+            )
+            (value_net): Sequential(
+              (0): Linear(in_features=356, out_features=64, bias=True)
+              (1): Tanh()
+              (2): Linear(in_features=64, out_features=64, bias=True)
+              (3): Tanh()
+            )
+          )
+          (action_net): Linear(in_features=64, out_features=17, bias=True)
+          (value_net): Linear(in_features=64, out_features=1, bias=True)
+        )
+policy_class:
+    value: <class 'stable_baselines3.common.policies.ActorCriticPolicy'>
+policy_kwargs:
+    value: '{}'
+rollout_buffer:
+    value: <stable_baselines3.common.buffers.RolloutBuffer object at 0x70b1670d8d10>
+rollout_buffer_class:
+    value: <class 'stable_baselines3.common.buffers.RolloutBuffer'>
+rollout_buffer_kwargs:
+    value: '{}'
+save_dir:
+    value: checkpoints
+sde_sample_freq:
+    value: -1
+seed:
+    value: None
+start_time:
+    value: 1779206834163386728
+target_kl:
+    value: None
+tensorboard_log:
+    value: None
+timesteps:
+    value: 3000000
+use_sde:
+    value: "False"
+verbose:
+    value: 1
+vf_coef:
+    value: 0.5
+video_dir:
+    value: videos/training
+video_freq:
+    value: 500000

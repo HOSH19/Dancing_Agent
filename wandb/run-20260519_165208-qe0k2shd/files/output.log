@@ -1,0 +1,154 @@
+Using cpu device
+/home/hoshuhan/miniconda3/envs/dancing-agent/lib/python3.11/site-packages/gymnasium/spaces/box.py:236: UserWarning: [33mWARN: Box low's precision lowered by casting to float32, current low.dtype=float64[0m
+  gym.logger.warn(
+/home/hoshuhan/miniconda3/envs/dancing-agent/lib/python3.11/site-packages/gymnasium/spaces/box.py:306: UserWarning: [33mWARN: Box high's precision lowered by casting to float32, current high.dtype=float64[0m
+  gym.logger.warn(
+/home/hoshuhan/miniconda3/envs/dancing-agent/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:3023: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[:, None]
+/home/hoshuhan/miniconda3/envs/dancing-agent/lib/python3.11/site-packages/numpy/lib/_function_base_impl.py:3024: RuntimeWarning: invalid value encountered in divide
+  c /= stddev[None, :]
+  [video] hiphop → videos/training/step_000005000/hiphop.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] waltz → videos/training/step_000005000/waltz.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] edm → videos/training/step_000005000/edm.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] side-by-side → videos/training/step_000005000/all_genres.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+---------------------------------
+| reward/            |          |
+|    r_alive         | 4.47     |
+|    r_beat          | 0.00171  |
+|    r_diversity     | -0.672   |
+|    r_energy        | 0.397    |
+| rollout/           |          |
+|    ep_len_mean     | 22.2     |
+|    ep_rew_mean     | 29.9     |
+| time/              |          |
+|    fps             | 603      |
+|    iterations      | 1        |
+|    time_elapsed    | 13       |
+|    total_timesteps | 8192     |
+---------------------------------
+  [video] hiphop → videos/training/step_000010000/hiphop.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] waltz → videos/training/step_000010000/waltz.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] edm → videos/training/step_000010000/edm.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] side-by-side → videos/training/step_000010000/all_genres.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] hiphop → videos/training/step_000015000/hiphop.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] waltz → videos/training/step_000015000/waltz.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] edm → videos/training/step_000015000/edm.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] side-by-side → videos/training/step_000015000/all_genres.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+----------------------------------------
+| reward/                 |            |
+|    r_alive              | 4.47       |
+|    r_beat               | 0.00183    |
+|    r_diversity          | -0.704     |
+|    r_energy             | 0.387      |
+| rollout/                |            |
+|    ep_len_mean          | 22.5       |
+|    ep_rew_mean          | 30.4       |
+| time/                   |            |
+|    fps                  | 340        |
+|    iterations           | 2          |
+|    time_elapsed         | 48         |
+|    total_timesteps      | 16384      |
+| train/                  |            |
+|    approx_kl            | 0.03358437 |
+|    clip_fraction        | 0.305      |
+|    clip_range           | 0.2        |
+|    entropy_loss         | -24.2      |
+|    explained_variance   | -0.355     |
+|    learning_rate        | 0.0003     |
+|    loss                 | -0.177     |
+|    n_updates            | 10         |
+|    policy_gradient_loss | -0.0497    |
+|    std                  | 1          |
+|    value_loss           | 0.378      |
+----------------------------------------
+  [video] hiphop → videos/training/step_000020000/hiphop.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] waltz → videos/training/step_000020000/waltz.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] edm → videos/training/step_000020000/edm.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] side-by-side → videos/training/step_000020000/all_genres.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+-----------------------------------------
+| reward/                 |             |
+|    r_alive              | 4.49        |
+|    r_beat               | 0.00183     |
+|    r_diversity          | -0.617      |
+|    r_energy             | 0.352       |
+| rollout/                |             |
+|    ep_len_mean          | 26.8        |
+|    ep_rew_mean          | 36.4        |
+| time/                   |             |
+|    fps                  | 330         |
+|    iterations           | 3           |
+|    time_elapsed         | 74          |
+|    total_timesteps      | 24576       |
+| train/                  |             |
+|    approx_kl            | 0.037883587 |
+|    clip_fraction        | 0.36        |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -24.2       |
+|    explained_variance   | 0.665       |
+|    learning_rate        | 0.0003      |
+|    loss                 | -0.28       |
+|    n_updates            | 20          |
+|    policy_gradient_loss | -0.0638     |
+|    std                  | 1           |
+|    value_loss           | 0.118       |
+-----------------------------------------
+  [video] hiphop → videos/training/step_000025000/hiphop.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] waltz → videos/training/step_000025000/waltz.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] edm → videos/training/step_000025000/edm.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] side-by-side → videos/training/step_000025000/all_genres.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] hiphop → videos/training/step_000030000/hiphop.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] waltz → videos/training/step_000030000/waltz.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] edm → videos/training/step_000030000/edm.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+  [video] side-by-side → videos/training/step_000030000/all_genres.mp4
+[34m[1mwandb[0m: [33mWARNING[0m `fps` argument does not affect the frame rate of the video when providing a file path or raw bytes.
+-----------------------------------------
+| reward/                 |             |
+|    r_alive              | 4.5         |
+|    r_beat               | 0.00232     |
+|    r_diversity          | -0.546      |
+|    r_energy             | 0.333       |
+| rollout/                |             |
+|    ep_len_mean          | 30.9        |
+|    ep_rew_mean          | 42.2        |
+| time/                   |             |
+|    fps                  | 299         |
+|    iterations           | 4           |
+|    time_elapsed         | 109         |
+|    total_timesteps      | 32768       |
+| train/                  |             |
+|    approx_kl            | 0.042401567 |
+|    clip_fraction        | 0.402       |
+|    clip_range           | 0.2         |
+|    entropy_loss         | -24.3       |
+|    explained_variance   | 0.752       |
+|    learning_rate        | 0.0003      |
+|    loss                 | -0.294      |
+|    n_updates            | 30          |
+|    policy_gradient_loss | -0.0689     |
+|    std                  | 1.01        |
+|    value_loss           | 0.131       |
+-----------------------------------------
+[34m[1mwandb[0m: [33mWARNING[0m Symlinked 1 file into the W&B run directory; call wandb.save again to sync new files.
