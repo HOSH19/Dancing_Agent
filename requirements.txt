@@ -1,9 +1,0 @@
-# Install PyTorch separately with CUDA support before this file:
-#   pip install torch --index-url https://download.pytorch.org/whl/cu124
-mujoco>=3.0
-gymnasium[mujoco]>=1.0
-stable-baselines3>=2.3
-imageio[ffmpeg]
-librosa
-numpy
-wandb

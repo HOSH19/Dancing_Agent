@@ -1,15 +1,6 @@
+wandb/
 __pycache__/
 *.pyc
-*.pyo
 .DS_Store
+*.pt
 checkpoints/
-features/
-videos/
-runs/
-logs/
-audio/*.mp3
-audio/*.wav
-audio/*.m4a
-*.npy
-*.zip
-*.pkl
