@@ -2,8 +2,8 @@ import numpy as np
 import wandb
 from stable_baselines3.common.callbacks import BaseCallback
 
-_KEYS = ("r_beat", "r_energy", "r_alive", "r_diversity")
-_SHORT = {"r_beat": "beat", "r_energy": "energy", "r_alive": "alive", "r_diversity": "diversity"}
+_KEYS = ("r_beat", "r_energy", "r_genre")
+_SHORT = {"r_beat": "beat", "r_energy": "energy", "r_genre": "genre"}
 
 
 class RewardLogCallback(BaseCallback):

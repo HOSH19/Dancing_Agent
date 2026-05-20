@@ -17,13 +17,11 @@ class DanceEnvWithReward(DanceEnv):
         obs, base_reward, terminated, truncated, info = super().step(action)
         reward, reward_info = self._tracker.update(
             genre=info.get("genre", "hiphop"),
-            base_reward=base_reward,
             beat_phase=info.get("beat_phase", 0.0),
             rms_energy=info.get("rms_energy", 0.0),
             com_velocity=float(np.linalg.norm(self.data.qvel[:3])),
             com_height=float(self.data.qpos[2]),
             foot_contacts=self.foot_contacts(),
-            step=info.get("audio_step", 0),
         )
         info.update(reward_info)
         return obs, reward, terminated, truncated, info

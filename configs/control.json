@@ -1,6 +1,5 @@
 {
   "w_beat": 0.50,
-  "w_energy": 0.30,
-  "w_alive": 0.05,
-  "w_diversity": 0.15
+  "w_energy": 0.35,
+  "w_genre": 0.15
 }
