@@ -23,42 +23,88 @@ Use the `dancing-agent` conda environment:
 conda activate dancing-agent
 ```
 
-## Reward Design — Lessons Learned
+## Project Goal
 
-### Bugs fixed (do not reintroduce)
+Teach a MuJoCo humanoid to **walk in time with music** — footsteps synchronized to the beat. This is a two-phase curriculum:
+
+- **Phase 1** (`configs/walk_phase1.json`): Pure locomotion. No music. Rewards forward velocity, staying upright, and penalizes control cost. Goal: stable walking before any music signal is introduced.
+- **Phase 2** (`configs/walk_phase2.json`): Locomotion + beat sync. Builds on a Phase 1 checkpoint. Adds `w_beat` to reward footstrikes timed to the beat phase.
+
+Training commands:
+```bash
+# Phase 1
+python train.py --config configs/walk_phase1.json --timesteps 2000000 --run_name walk_phase1
+
+# Phase 2 (after Phase 1 checkpoint saved)
+python train.py --config configs/walk_phase2.json --timesteps 2000000 \
+  --load_checkpoint checkpoints/dance_agent_final --run_name walk_phase2
+```
+
+Phase 1 success criteria before moving to Phase 2: `ep_len_mean > 300`, `reward/forward` rising steadily, video shows continuous forward walking.
+
+## Reward Design
+
+### Weights
+
+**Phase 1** (`walk_phase1.json`):
+```json
+{"w_forward": 0.60, "w_alive": 0.30, "w_ctrl": 0.10, "w_beat": 0.00}
+```
+
+**Phase 2** (`walk_phase2.json`):
+```json
+{"w_forward": 0.40, "w_alive": 0.25, "w_ctrl": 0.10, "w_beat": 0.25}
+```
+
+All weights must sum to 1.0 (note: `w_ctrl` is subtracted, so `w_forward + w_alive + w_beat = 0.90` and `w_ctrl = 0.10`).
+
+### Component signals
+
+| Signal | Formula | Notes |
+|---|---|---|
+| `r_forward` | `tanh(qvel[0] / 1.25)` | Peaks at 1.25 m/s walking speed |
+| `r_alive` | `clamp((com_height - 1.0) / 0.3, 0, 1)` | Shaped survival; 1.3 m = full reward |
+| `r_ctrl` | `mean(action²)` | Subtracted — penalizes flailing |
+| `r_beat` | Gaussian phase bonus on landing + LIFT_BONUS + BEAT_PULSE | See beat.py |
+
+### Beat reward details (`rewards/beat.py`)
+
+- **Gaussian phase bonus**: `exp(-8 * (1 - beat_phase)²)` — fires on each foot landing, rewarding steps near the beat peak.
+- **LIFT_BONUS = 0.15**: fires on each foot lift (contact falling edge). Breaks the no-step attractor where the agent avoids stepping to avoid the risk of falling.
+- **BEAT_PULSE = 0.05**: dense per-step signal scaled by `beat_phase`. Provides a continuous gradient even before footstrike synchronization emerges.
+
+## Bugs Fixed (do not reintroduce)
 
 **Contact detection** (`envs/contacts.py`): originally used `abs(contact.dist)` (penetration depth ≈ 0.002) against a threshold of 0.01 — contacts were *never* detected. Must use `mujoco.mj_contactForce()` with a threshold of ~1 N. Standing humanoid produces ~80 N ground reaction force.
 
-**Alive reward domination** (`rewards/reward_fn.py`): `base_reward` from `HumanoidEnv` includes a hardcoded `healthy_reward=5.0` constant. Even at `W_ALIVE=0.05`, this contributes 0.25/step vs beat's 0.012/step. Fix: set `r_alive = 1.0` (constant survival flag) so alive contributes 0.05/step and beat can dominate.
+**No-step attractor** (`rewards/beat.py`): beat reward only fired on foot landing (contact rising edge). Agent learned to never lift feet — landing never happens, beat gradient is zero. Fix: `LIFT_BONUS = 0.15` per foot-lift.
 
-**Beat reward sparsity** (`rewards/beat.py`): original binary `beat_indicator > 0.5` fired only on the exact beat frame (~4.4% of steps). Replaced with a Gaussian over `beat_phase`: `exp(-8 * (1 - beat_phase)^2)`, giving partial credit across the whole beat cycle.
+**Eval VecNormalize never synced** (`callbacks/wandb_eval_callback.py`): eval env diverges from training obs_rms after 500K+ steps → model acts on mis-scaled obs → agent falls in 1–2 steps → `eval/mean_ep_length ≈ 0`. Fix: deep-copy obs_rms/ret_rms from training env before each eval.
 
-**No-step attractor** (`rewards/beat.py`): beat reward only fires on foot *landing* (contact rising edge). Agent discovers it can avoid the termination risk of stepping by never lifting feet — landing never happens, beat gradient is zero. Fix: add `LIFT_BONUS = 0.05` per foot-lift event (contact falling edge) to give a dense gradient signal for any stepping behavior.
+**Standing-still local optimum**: when only `r_alive` provides positive reward and there's no forward velocity signal, the agent learns to stand motionless — maximizes alive, zero beat/energy. Fix: `r_forward = tanh(qvel[0] / 1.25)` eliminates this loophole by requiring actual walking.
 
-**Eval VecNormalize never synced** (`callbacks/wandb_eval_callback.py`): eval env created once at callback construction with `training=False`. After 500K+ training steps, obs_rms diverges from default → model acts on mis-scaled obs → agent falls in 1–2 steps → `eval/mean_ep_length ≈ 0`. Fix: deep-copy obs_rms/ret_rms from training env at the start of each `_on_step` eval trigger.
+**PPO instability** (`train.py`): with `n_steps=2048` and `lr=3e-4`, `clip_fraction` reached 0.81 and `approx_kl` reached 1.7–2.3. Fix: `n_steps=8192`, `batch_size=256`, `n_epochs=5`, `lr=1e-4`, `target_kl=0.05`. Verified at 400k steps: `clip_fraction=0.10`, `approx_kl=0.0096`.
 
-### Genre-specific rewards (`rewards/genre_reward.py`)
+## PPO Health Targets
 
-Replaced diversity (always −0.5, useless penalty) with direct movement-quality rewards per genre:
-
-| Genre | Reward | Signal |
+| Metric | Target | Danger zone |
 |---|---|---|
-| waltz | CoM height std over last 20 steps × 20 | Rise-and-fall oscillation |
-| hiphop | Landing force / 200 N (per foot, capped 1.0) | Stomp intensity |
-| edm | 1.0 if both feet airborne, else 0 | Jump / bounce |
+| `clip_fraction` | 0.05–0.20 | > 0.40 → reduce LR or increase n_steps |
+| `approx_kl` | 0.005–0.05 | > 0.10 → policy diverging |
+| `ep_len_mean` | > 300 by 1M steps (Phase 1) | < 150 at 1M → survival reward not working |
 
-These fire per step (waltz, edm) or per landing event (hiphop). Weight controlled by `w_genre` in configs.
+### Diagnosing regressions
+- `ep_len_mean` plateaus below 150 → agent not learning to walk; check `reward/forward` is rising
+- `reward/forward ≈ 0` with high `reward/alive` → standing-still local optimum; `r_forward` should be pulling the agent forward
+- `reward/beat ≈ 0` in Phase 2 → beat signal not reaching the agent; check `BEAT_PULSE` and contact detection
+- `eval/mean_ep_length ≈ 0` while training is long → eval VecNormalize out of sync
+- `clip_fraction > 0.40` → reduce LR or lower `target_kl`
 
-### Current weights (r_alive removed — constant 1.0 contributes nothing to gradient)
-```python
-W_BEAT, W_ENERGY, W_GENRE = 0.5, 0.35, 0.15  # control config
-```
-Approximate per-step contribution when dancing well: beat ≈ 0.15–0.25 (includes lift bonus), energy ≈ 0.10, genre ≈ 0.05–0.15.
+## Related Work / Novelty
 
-### Diagnosing future regressions
-- If `reward/alive` dominates WandB charts → alive signal is too strong again
-- If `beat/edm = 0` throughout → contact detection is broken (check force threshold)
-- If `ep_len_mean` plateaus below 200 steps → agent found standing-still local optimum
-- If beat reward declines after initial spike → agent settling into no-movement policy; increase `W_BEAT` or add a per-step stepping incentive
-- If `eval/mean_ep_length ≈ 0` while training episodes are long → eval VecNormalize is out of sync (check `_sync_normalize` in `WandbEvalCallback`)
-- If diversity reward is consistently −0.3 to −0.7 → diversity is acting as pure penalty (gait hasn't differentiated per genre); run `no_diversity` ablation to isolate
+**This project is novel as of May 2026.** The closest published work:
+
+- **DFM: Deep Fourier Mimic** (Watanabe et al., Feb 2025, [arxiv:2502.10980](https://arxiv.org/abs/2502.10980)): humanoid RL for dance, but imitates *pre-recorded motion capture data* using Fourier representations. No music input at inference time.
+- **Music-synchronized robot papers**: scripted choreography with beat detection, not RL.
+
+**Key differentiator**: this project teaches a humanoid to walk in time with music using only audio-derived reward signals (beat phase, RMS energy) with no reference motion data and no pre-recorded choreography. The question — *can a humanoid learn rhythmically timed locomotion purely from music structure?* — is unaddressed in published work.

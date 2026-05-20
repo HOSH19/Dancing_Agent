@@ -1,11 +1,12 @@
 import math
 
 FOOT_FORCE_THRESHOLD = 1.0  # Newtons
-LIFT_BONUS = 0.05  # small dense reward for any foot lift, breaks no-step attractor
+LIFT_BONUS = 0.15  # raised from 0.05 to more forcefully break no-step attractor
+BEAT_PULSE = 0.05  # dense per-step signal regardless of foot state
 
 
 def beat_reward(foot_contacts: dict, prev_contacts: dict, beat_phase: float) -> tuple[float, dict]:
-    r = 0.0
+    r = BEAT_PULSE * beat_phase  # continuous gradient toward beats every step
     step_events = {}
     phase_bonus = float(math.exp(-8.0 * (1.0 - beat_phase) ** 2))
     for foot, force in foot_contacts.items():

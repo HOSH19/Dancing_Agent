@@ -1,26 +1,20 @@
 from rewards.beat import beat_reward
-from rewards.energy import EnergyCorrelation
-from rewards.genre_reward import genre_reward
+from rewards.walk import walk_reward
 
 
-class DanceRewardTracker:
-    def __init__(self, w_beat=0.5, w_energy=0.35, w_genre=0.15):
-        self._w = (w_beat, w_energy, w_genre)
-        self._energy = EnergyCorrelation()
+class WalkRewardTracker:
+    def __init__(self, w_forward=0.6, w_alive=0.3, w_ctrl=0.1, w_beat=0.0, **_):
+        self._w = (w_forward, w_alive, w_ctrl, w_beat)
         self._prev_contacts: dict = {}
-        self._com_heights: list = []
 
     def reset_episode(self):
-        self._energy.reset()
         self._prev_contacts = {}
-        self._com_heights = []
 
-    def update(self, *, genre, beat_phase, rms_energy,
-               com_velocity, com_height, foot_contacts) -> tuple:
-        r_beat, events = beat_reward(foot_contacts, self._prev_contacts, beat_phase)
-        self._com_heights.append(com_height)
-        r_energy = self._energy.update(com_velocity, rms_energy)
-        r_genre = genre_reward(genre, foot_contacts, events, self._com_heights)
-        wb, we, wg = self._w
-        total = wb * r_beat + we * r_energy + wg * r_genre
-        return float(total), {"r_beat": r_beat, "r_energy": r_energy, "r_genre": r_genre}
+    def update(self, *, beat_phase, com_height, forward_vel, action_sq_norm, foot_contacts) -> tuple:
+        w_fwd, wa, wc, wb = self._w
+        r_forward, r_alive, r_ctrl = walk_reward(forward_vel, com_height, action_sq_norm)
+        r_beat = 0.0
+        if wb > 0.0:
+            r_beat, _ = beat_reward(foot_contacts, self._prev_contacts, beat_phase)
+        total = w_fwd * r_forward + wa * r_alive - wc * r_ctrl + wb * r_beat
+        return float(total), {"r_forward": r_forward, "r_alive": r_alive, "r_ctrl": r_ctrl, "r_beat": r_beat}

@@ -25,9 +25,9 @@ def build_envs(features_dir, genre, n_envs, reward_weights):
 
 
 def build_model(env):
-    return PPO("MlpPolicy", env, n_steps=2048, batch_size=64, n_epochs=10,
-               learning_rate=3e-4, ent_coef=0.01, gamma=0.99, gae_lambda=0.95,
-               clip_range=0.2, verbose=1, device="cpu")
+    return PPO("MlpPolicy", env, n_steps=8192, batch_size=256, n_epochs=5,
+               learning_rate=1e-4, ent_coef=0.02, gamma=0.99, gae_lambda=0.95,
+               clip_range=0.2, target_kl=0.05, verbose=1, device="cpu")
 
 
 def build_callbacks(features_dir, genre, n_envs, eval_freq, save_dir, reward_weights):
@@ -52,7 +52,9 @@ def main():
     p.add_argument("--video_freq", type=int, default=500_000)
     p.add_argument("--run_name", type=str, default=None)
     p.add_argument("--config", type=str, default=None,
-                   help="Path to reward weights JSON (e.g. configs/control.json)")
+                   help="Path to reward weights JSON (e.g. configs/walk_phase1.json)")
+    p.add_argument("--load_checkpoint", type=str, default=None,
+                   help="Path to a saved PPO model to continue training from (e.g. for phase 2)")
     args = p.parse_args()
 
     reward_weights = json.loads(open(args.config).read()) if args.config else {}
@@ -68,7 +70,10 @@ def main():
     )
 
     env = build_envs(args.features_dir, args.genre, args.n_envs, reward_weights)
-    model = build_model(env)
+    if args.load_checkpoint:
+        model = PPO.load(args.load_checkpoint, env=env)
+    else:
+        model = build_model(env)
     genres = [args.genre] if args.genre else GENRES
     video_cb = VideoCallback(
         features_dir=args.features_dir,
