@@ -3,40 +3,25 @@ import torch.nn as nn
 from torch.distributions import Normal
 
 
+def _mlp(in_dim, out_dim, hidden=512):
+    return nn.Sequential(
+        nn.Linear(in_dim, hidden), nn.Tanh(),
+        nn.Linear(hidden, hidden), nn.Tanh(),
+        nn.Linear(hidden, hidden), nn.Tanh(),
+        nn.Linear(hidden, out_dim),
+    )
+
+
 class PPOAgent(nn.Module):
     def __init__(self, num_inputs: int, num_actions: int):
-        super(PPOAgent, self).__init__()
-
-        # Actor Network for mu
-        self.actor_mu = nn.Sequential(
-            nn.Linear(num_inputs, 512),
-            nn.Tanh(),
-            nn.Linear(512, 512),
-            nn.Tanh(),
-            nn.Linear(512, 512),
-            nn.Tanh(),
-            nn.Linear(512, num_actions),
-            nn.Tanh()  # [-1, 1]
-        )
-
-        # Diagonal covariance matrix variables are separately trained
+        super().__init__()
+        self.actor_mu = nn.Sequential(*_mlp(num_inputs, num_actions), nn.Tanh())
         self.actor_logstd = nn.Parameter(torch.ones(1, num_actions) * -0.5)
-
-        # Critic Network
-        self.critic = nn.Sequential(
-            nn.Linear(num_inputs, 512),
-            nn.Tanh(),
-            nn.Linear(512, 512),
-            nn.Tanh(),
-            nn.Linear(512, 512),
-            nn.Tanh(),
-            nn.Linear(512, 1)
-        )
+        self.critic = _mlp(num_inputs, 1)
 
     def forward(self, x):
         mu = self.actor_mu(x)
-        std = torch.exp(self.actor_logstd).expand_as(mu)
-        return mu, std
+        return mu, torch.exp(self.actor_logstd).expand_as(mu)
 
     def get_value(self, x):
         return self.critic(x)
@@ -45,7 +30,5 @@ class PPOAgent(nn.Module):
         mu, std = self.forward(x)
         dist = Normal(mu, std)
         if action is None:
-            action = dist.rsample()  # reparameterization trick because the action is continuous
-        log_prob = dist.log_prob(action).sum(-1)  # sum log prob of each action dimension
-        entropy = dist.entropy().mean(-1)  # average entropy per action dimension
-        return action, log_prob, entropy, self.get_value(x)
+            action = dist.rsample()
+        return action, dist.log_prob(action).sum(-1), dist.entropy().mean(-1), self.get_value(x)

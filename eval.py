@@ -20,32 +20,32 @@ def parse_args():
     return p.parse_args()
 
 
-def main():
-    args = parse_args()
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
+def load_agent(model_path, device):
     env = gym.make("Humanoid-v5", render_mode="rgb_array")
-    obs_dim = env.observation_space.shape[0]
-    action_dim = env.action_space.shape[0]
-
-    agent = PPOAgent(obs_dim, action_dim).to(device)
-    agent.load_state_dict(torch.load(args.model, map_location=device))
+    agent = PPOAgent(env.observation_space.shape[0], env.action_space.shape[0]).to(device)
+    agent.load_state_dict(torch.load(model_path, map_location=device))
     agent.eval()
+    return env, agent
 
-    wandb.init(project=args.wandb_project, name=args.run_name, config=vars(args))
 
-    for ep in range(args.episodes):
+def eval_loop(env, agent, device, n_episodes):
+    for ep in range(n_episodes):
         frames, total_reward, steps = run_episode(env, agent, device)
-        video_path = frames_to_video(frames)
-
         wandb.log({
             "episode": ep,
             "reward": total_reward,
             "episode_length": steps,
-            "video": wandb.Video(video_path, fps=30, format="mp4"),
+            "video": wandb.Video(frames_to_video(frames), fps=30, format="mp4"),
         })
         print(f"Episode {ep+1}: reward={total_reward:.1f}, steps={steps}")
 
+
+def main():
+    args = parse_args()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    env, agent = load_agent(args.model, device)
+    wandb.init(project=args.wandb_project, name=args.run_name, config=vars(args))
+    eval_loop(env, agent, device, args.episodes)
     env.close()
     wandb.finish()
 

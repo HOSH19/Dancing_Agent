@@ -1,0 +1,17 @@
+{
+  "checkpoint": "checkpoints/walk_finetune.pt",
+  "run_name": "walk-finetune-v3",
+  "epochs": 200,
+  "n_envs": 4,
+  "n_steps": 1024,
+  "batch_size": 256,
+  "train_iters": 10,
+  "lr": 3e-5,
+  "gamma": 0.995,
+  "gae_lambda": 0.95,
+  "clip_eps": 0.2,
+  "ent_coef": 0.005,
+  "vf_coef": 0.5,
+  "target_kl": 0.01,
+  "video_every": 20
+}
