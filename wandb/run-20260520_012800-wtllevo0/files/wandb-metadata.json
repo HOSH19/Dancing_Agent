@@ -1,19 +1,25 @@
 {
   "os": "Linux-6.8.0-1058-gcp-x86_64-with-glibc2.35",
   "python": "CPython 3.11.15",
-  "startedAt": "2026-05-19T22:06:46.546341Z",
+  "startedAt": "2026-05-20T01:28:00.262735Z",
   "args": [
+    "--config",
+    "configs/energy_heavy.json",
     "--timesteps",
-    "1_500_000",
+    "3_000_000",
     "--n_envs",
-    "4"
+    "2",
+    "--save_dir",
+    "checkpoints/v5_energy_heavy",
+    "--video_dir",
+    "videos/v5_energy_heavy"
   ],
   "program": "/home/hoshuhan/Dancing_Agent/train.py",
   "codePath": "train.py",
   "codePathLocal": "train.py",
   "git": {
     "remote": "https://github.com/HOSH19/Dancing_Agent.git",
-    "commit": "076fdf1cafdcb23d1ef4850ee7fea3809a338864"
+    "commit": "0757602eb96a49b838d6297fc54af067b0984d10"
   },
   "email": "hoshuhan@gmail.com",
   "root": "/home/hoshuhan/Dancing_Agent",
@@ -24,11 +30,11 @@
   "disk": {
     "/": {
       "total": "51835101184",
-      "used": "30180544512"
+      "used": "30691172352"
     }
   },
   "memory": {
     "total": "33651986432"
   },
-  "writerId": "spg40dj46vx9n52tt5sbnfmpvdu8af6k"
+  "writerId": "1wv38pnwiwu04sn2x3bw26a8sgj34bbl"
 }
