@@ -1,5 +1,6 @@
-import sys
+import csv
 import os
+import sys
 
 import numpy as np
 import torch
@@ -8,6 +9,21 @@ import wandb
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "ppo"))
 from ppo_update import ppo_update
 from eval_utils import run_episode, frames_to_video
+
+_CSV_PATH = "log/metrics.csv"
+_CSV_FIELDS = ["epoch", "reward/total", "reward/forward", "reward/clearance", "reward/upright", "reward/arm",
+               "train/ep_len", "ppo/policy_loss", "ppo/value_loss", "ppo/entropy", "ppo/kl", "ppo/clip_frac"]
+
+
+def init_csv():
+    os.makedirs(os.path.dirname(_CSV_PATH), exist_ok=True)
+    with open(_CSV_PATH, "w", newline="") as f:
+        csv.DictWriter(f, fieldnames=_CSV_FIELDS).writeheader()
+
+
+def _log_csv(row: dict):
+    with open(_CSV_PATH, "a", newline="") as f:
+        csv.DictWriter(f, fieldnames=_CSV_FIELDS, extrasaction="ignore").writerow(row)
 
 
 def update_iters(agent, optimizer, scaler, obs, act, lp, adv, ret, args):
@@ -22,7 +38,7 @@ def update_iters(agent, optimizer, scaler, obs, act, lp, adv, ret, args):
                                               args.clip_eps, args.vf_coef, args.ent_coef)
             pl_list.append(pl); vl_list.append(vl); ent_list.append(ent)
             kl_list.append(kl); cf_list.append(cf)
-            if kl > args.target_kl:
+            if abs(kl) > args.target_kl:
                 return pl_list, vl_list, ent_list, kl_list, cf_list
     return pl_list, vl_list, ent_list, kl_list, cf_list
 
@@ -46,6 +62,7 @@ def build_log(stats, ppo_lists, epoch, args, eval_env, agent, device):
         "reward/forward":   stats["forward"],
         "reward/clearance": stats["clearance"],
         "reward/upright":   stats["upright"],
+        "reward/arm":       stats["arm"],
         "train/ep_len":     stats["ep_len"],
         "ppo/policy_loss":  np.mean(pl_list),
         "ppo/value_loss":   np.mean(vl_list),
@@ -58,4 +75,5 @@ def build_log(stats, ppo_lists, epoch, args, eval_env, agent, device):
         log["eval/video"]  = wandb.Video(frames_to_video(frames), fps=30, format="mp4")
         log["eval/reward"] = ep_reward
         log["eval/ep_len"] = ep_len
+    _log_csv({"epoch": epoch, **log})
     return log

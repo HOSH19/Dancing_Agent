@@ -1,0 +1,18 @@
+{
+  "checkpoint": "checkpoints/walk_finetune_v1.pt",
+  "run_name": "arm-v2-sharper",
+  "epochs": 300,
+  "n_envs": 4,
+  "n_steps": 2048,
+  "batch_size": 256,
+  "train_iters": 10,
+  "lr": 1e-5,
+  "gamma": 0.99,
+  "gae_lambda": 0.95,
+  "clip_eps": 0.2,
+  "ent_coef": 0.005,
+  "vf_coef": 0.5,
+  "target_kl": 0.02,
+  "video_every": 20,
+  "wandb": false
+}

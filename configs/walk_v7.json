@@ -1,17 +1,18 @@
 {
   "checkpoint": "ppo/model.pt",
-  "run_name": "walk-finetune-v6",
+  "run_name": "walk-v8-highstep",
   "epochs": 200,
   "n_envs": 4,
   "n_steps": 1024,
   "batch_size": 256,
   "train_iters": 10,
   "lr": 3e-5,
-  "gamma": 0.995,
+  "gamma": 0.99,
   "gae_lambda": 0.95,
   "clip_eps": 0.2,
   "ent_coef": 0.005,
   "vf_coef": 0.5,
   "target_kl": 0.02,
-  "video_every": 10
+  "video_every": 10,
+  "wandb": false
 }

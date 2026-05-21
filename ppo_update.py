@@ -5,7 +5,7 @@ import torch.nn as nn
 def _compute_losses(agent, obs, actions, returns, old_log_probs, advantages, clip_eps, vf_coef, ent_coef):
     _, new_log_probs, entropies, new_values = agent.get_action_and_value(obs, actions)
     ratio = torch.exp(new_log_probs - old_log_probs)
-    kl = ((old_log_probs - new_log_probs) / actions.size(-1)).mean()
+    kl = (old_log_probs - new_log_probs).mean()
     surr1 = ratio * advantages
     surr2 = torch.clamp(ratio, 1 - clip_eps, 1 + clip_eps) * advantages
     clip_fraction = ((ratio < 1 - clip_eps) | (ratio > 1 + clip_eps)).float().mean()
